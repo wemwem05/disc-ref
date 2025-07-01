@@ -52,7 +52,7 @@ async def on_member_join(member):
         print(f"✅ Found invite used by: {inviter.name}")
 
         # Replace with your real channel name!
-        channel = discord.utils.get(member.guild.text_channels, name="general")
+        channel = discord.utils.get(member.guild.text_channels, name="test")
         if channel:
             await channel.send(
                 f"{member.name} joined using {inviter.name}'s invite link! 🎉 "
