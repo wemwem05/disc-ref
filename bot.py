@@ -48,8 +48,8 @@ async def on_member_join(member):
             break
 
     if used_invite:
-    inviter_id = invite_owners.get(used_invite.code)
-    inviter = member.guild.get_member(inviter_id) if inviter_id else None
+        inviter_id = invite_owners.get(used_invite.code)
+        inviter = member.guild.get_member(inviter_id) if inviter_id else None
 
         if inviter:
             referral_counts[inviter.id] = referral_counts.get(inviter.id, 0) + 1
