@@ -18,26 +18,28 @@ referral_counts = {}  # Optional: Track total invites per user
 
 @bot.event
 async def on_ready():
-    print(f'Logged in as {bot.user}')
+    print(f'✅ Logged in as {bot.user}')
     for guild in bot.guilds:
         invites = await guild.invites()
         guild_invites[guild.id] = {invite.code: invite.uses for invite in invites}
+    print("✅ Invite cache initialized.")
+
 
 @bot.event
 async def on_member_join(member):
-    print(f"New member joined: {member.name}")
+    print(f"👤 New member joined: {member.name}")
 
+    # Get invites before and after
     invites_before = guild_invites.get(member.guild.id, {})
     invites_after = await member.guild.invites()
 
     used_invite = None
-    for invite in invites_after:
-        before_uses = invites_before.get(invite.code)
-        after_uses = invite.uses
 
-        # If we don't have both values as integers, skip this invite
-        if before_uses is None or after_uses is None:
-            continue
+    for invite in invites_after:
+        before_uses = invites_before.get(invite.code, 0)
+        after_uses = invite.uses or 0
+
+        print(f"Checking invite {invite.code} | Before: {before_uses} | After: {after_uses}")
 
         if after_uses > before_uses:
             used_invite = invite
@@ -47,21 +49,21 @@ async def on_member_join(member):
         inviter = used_invite.inviter
         referral_counts[inviter.id] = referral_counts.get(inviter.id, 0) + 1
 
-        # Log or send message
-        channel = discord.utils.get(member.guild.text_channels, name="test")
+        print(f"✅ Found invite used by: {inviter.name}")
 
-        if channel is None:
-            print("❗ Channel 'general' not found.")
-        else:
-            print(f"✅ Found channel: {channel.name}")
+        # Replace with your real channel name!
+        channel = discord.utils.get(member.guild.text_channels, name="general")
+        if channel:
             await channel.send(
                 f"{member.name} joined using {inviter.name}'s invite link! 🎉 "
                 f"(Total invites: {referral_counts[inviter.id]})"
             )
+    else:
+        print("❗ No matching invite found. Possibly bot restarted and lost tracking.")
 
-
-    # Update stored invites
+    # Update invite cache
     guild_invites[member.guild.id] = {invite.code: invite.uses for invite in invites_after}
+
 
 
 
