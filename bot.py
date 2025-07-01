@@ -3,6 +3,8 @@ from discord.ext import commands
 import os
 from dotenv import load_dotenv
 
+invite_owners = {}  # invite.code ➝ inviter.id
+
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
@@ -46,20 +48,23 @@ async def on_member_join(member):
             break
 
     if used_invite:
-        inviter = used_invite.inviter
-        referral_counts[inviter.id] = referral_counts.get(inviter.id, 0) + 1
+    inviter_id = invite_owners.get(used_invite.code)
+    inviter = member.guild.get_member(inviter_id) if inviter_id else None
 
-        print(f"✅ Found invite used by: {inviter.name}")
+        if inviter:
+            referral_counts[inviter.id] = referral_counts.get(inviter.id, 0) + 1
 
-        # Replace with your real channel name!
-        channel = discord.utils.get(member.guild.text_channels, name="test")
-        if channel:
-            await channel.send(
-                f"{member.name} joined using {inviter.name}'s invite link! 🎉 "
-                f"(Total invites: {referral_counts[inviter.id]})"
-            )
-    else:
-        print("❗ No matching invite found. Possibly bot restarted and lost tracking.")
+            print(f"✅ Found invite used by: {inviter.name}")
+
+            channel = discord.utils.get(member.guild.text_channels, name="test")
+            if channel:
+                await channel.send(
+                    f"{member.name} joined using {inviter.name}'s invite link! 🎉 "
+                    f"(Total invites: {referral_counts[inviter.id]})"
+                )
+        else:
+            print("⚠️ Invite used, but inviter not tracked.")
+
 
     # Update invite cache
     guild_invites[member.guild.id] = {invite.code: invite.uses for invite in invites_after}
@@ -70,6 +75,8 @@ async def on_member_join(member):
 @bot.command()
 async def referral(ctx):
     invite = await ctx.channel.create_invite(unique=True, max_uses=0, max_age=0)
+    invite_owners[invite.code] = ctx.author.id  # ✅ Track who created it
     await ctx.send(f"Here’s your personal invite link: {invite.url}")
+
 
 bot.run(TOKEN)
