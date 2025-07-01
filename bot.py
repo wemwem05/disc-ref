@@ -49,11 +49,16 @@ async def on_member_join(member):
 
         # Log or send message
         channel = discord.utils.get(member.guild.text_channels, name="test")
-        if channel:
+
+        if channel is None:
+            print("❗ Channel 'general' not found.")
+        else:
+            print(f"✅ Found channel: {channel.name}")
             await channel.send(
                 f"{member.name} joined using {inviter.name}'s invite link! 🎉 "
                 f"(Total invites: {referral_counts[inviter.id]})"
             )
+
 
     # Update stored invites
     guild_invites[member.guild.id] = {invite.code: invite.uses for invite in invites_after}
