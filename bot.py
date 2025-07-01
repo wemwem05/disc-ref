@@ -29,7 +29,9 @@ async def on_member_join(member):
     invites_after = await member.guild.invites()
 
     for invite in invites_after:
-        if invite.code in invites_before and invite.uses > invites_before[invite.code]:
+        before_uses = invites_before.get(invite.code, 0)
+        after_uses = invite.uses or 0
+        if after_uses > before_uses:
             inviter = invite.inviter
             # Track referral count (optional)
             if inviter.id in referral_counts:
