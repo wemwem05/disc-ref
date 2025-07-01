@@ -48,7 +48,7 @@ async def on_member_join(member):
         referral_counts[inviter.id] = referral_counts.get(inviter.id, 0) + 1
 
         # Log or send message
-        channel = discord.utils.get(member.guild.text_channels, name="general")
+        channel = discord.utils.get(member.guild.text_channels, name="test")
         if channel:
             await channel.send(
                 f"{member.name} joined using {inviter.name}'s invite link! 🎉 "
@@ -57,6 +57,7 @@ async def on_member_join(member):
 
     # Update stored invites
     guild_invites[member.guild.id] = {invite.code: invite.uses for invite in invites_after}
+
 
 
 @bot.command()
