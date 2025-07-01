@@ -38,7 +38,7 @@ async def on_member_join(member):
                 referral_counts[inviter.id] = 1
 
             # Log who invited whom
-            channel = discord.utils.get(member.guild.text_channels, name="general")
+            channel = discord.utils.get(member.guild.text_channels, name="test")
             if channel:
                 await channel.send(
                     f"{member.name} joined using {inviter.name}'s invite link! 🎉 "
